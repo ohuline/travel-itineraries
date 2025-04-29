@@ -1,1 +1,44 @@
+name: Générer PDF & envoyer email
+
+on:
+  push:
+    paths:
+      - 'index.html'
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Installer wkhtmltopdf
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wkhtmltopdf
+
+    - name: Configurer AWS CLI
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Installer dépendances Python
+      run: |
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install boto3 pdfkit
+
+    - name: Définir variables d'environnement
+      run: |
+        echo "S3_BUCKET=${{ secrets.S3_BUCKET }}" >> $GITHUB_ENV
+        echo "FROM_EMAIL=${{ secrets.FROM_EMAIL }}" >> $GITHUB_ENV
+
+    - name: Générer et envoyer PDF
+      run: |
+        source venv/bin/activate
+        python3 generate_pdf.py
 
