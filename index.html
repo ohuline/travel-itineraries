@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Prise de brief</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; }
+    label { display: block; margin-top: 1rem; }
+    input, textarea, select { width: 100%; padding: .5rem; }
+    button { margin-top: 1rem; padding: .7rem 1.5rem; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Prise de brief projet</h1>
+  <form id="briefForm">
+    <label>
+      Votre nom
+      <input type="text" name="name" required>
+    </label>
+    <label>
+      Email
+      <input type="email" name="email" required>
+    </label>
+    <label>
+      Nom du projet
+      <input type="text" name="projectName" required>
+    </label>
+    <label>
+      Objectifs / description
+      <textarea name="description" rows="4" required></textarea>
+    </label>
+    <label>
+      Budget estimé
+      <input type="number" name="budget" placeholder="€" required>
+    </label>
+    <label>
+      Deadline souhaitée
+      <input type="date" name="deadline">
+    </label>
+    <label>
+      Type de service
+      <select name="serviceType">
+        <option value="web">Web / Application</option>
+        <option value="design">Design graphique</option>
+        <option value="seo">SEO / Marketing</option>
+        <option value="autre">Autre</option>
+      </select>
+    </label>
+    <button type="submit">Envoyer le brief</button>
+  </form>
+
+  <p id="responseMessage"></p>
+
+  <script>
+    const form = document.getElementById('briefForm');
+    const msg  = document.getElementById('responseMessage');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      msg.textContent = '';
+
+      const data = Object.fromEntries(new FormData(form));
+      try {
+        const res = await fetch('/api/submit-brief', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const json = await res.json();
+        if (res.ok) {
+          msg.textContent = "👍 Merci ! Votre brief a bien été envoyé.";
+          msg.className = "success";
+          form.reset();
+        } else {
+          throw new Error(json.error || res.statusText);
+        }
+      } catch (err) {
+        msg.textContent = "❌ Une erreur est survenue : " + err.message;
+        msg.className = "error";
+      }
+    });
+  </script>
+</body>
+</html>
