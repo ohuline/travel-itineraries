@@ -2,9 +2,7 @@ name: Générer PDF & envoyer email
 
 on:
   push:
-    paths:
-      - 'index.html'
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   build:
