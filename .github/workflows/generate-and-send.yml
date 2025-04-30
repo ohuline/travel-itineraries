@@ -30,6 +30,12 @@ jobs:
         source venv/bin/activate
         pip install boto3 pdfkit
 
+    - name: Afficher l'arborescence
+      run: |
+        pwd
+        ls -R .
+
+
     - name: Définir variables d'environnement
       run: |
         echo "S3_BUCKET=${{ secrets.S3_BUCKET }}" >> $GITHUB_ENV
